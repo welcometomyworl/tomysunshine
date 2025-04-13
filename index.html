@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Anniversary Adventure ❤️</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #fff0f5;
+            color: #d23669;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.5s;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(210, 54, 105, 0.2);
+        }
+        
+        h1 {
+            color: #d23669;
+            margin-bottom: 30px;
+        }
+        
+        .game-section {
+            display: none;
+            padding: 20px;
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        /* Maze Styles */
+        #maze-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+            background-color: #f8e1e7;
+            border: 2px solid #d23669;
+        }
+        
+        .maze-wall {
+            position: absolute;
+            background-color: #d23669;
+        }
+        
+        #maze-player {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #ff6b81;
+            border-radius: 50%;
+            top: 20px;
+            left: 20px;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+        
+        #maze-goal {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #ff4757;
+            border-radius: 50%;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            z-index: 5;
+        }
+        
+        /* Quiz Styles */
+        .quiz-question {
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .quiz-option {
+            margin: 5px;
+            padding: 10px 20px;
+            background-color: #f8e1e7;
+            border: 1px solid #d23669;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 80%;
+            max-width: 400px;
+        }
+        
+        .quiz-option:hover {
+            background-color: #ff6b81;
+            color: white;
+        }
+        
+        .correct {
+            background-color: #2ed573;
+            color: white;
+        }
+        
+        .incorrect {
+            background-color: #ff4757;
+            color: white;
+        }
+        
+        /* Video Styles */
+        #video-container {
+            margin: 20px auto;
+            max-width: 600px;
+        }
+        
+        #unlock-button {
+            padding: 12px 25px;
+            background-color: #d23669;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        #unlock-button:hover {
+            background-color: #ff4757;
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: fall 5s linear infinite;
+            z-index: 100;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Our Anniversary Adventure ❤️</h1>
+        
+        <!-- Intro Screen -->
+        <div id="intro" class="game-section active">
+            <p>Happy Anniversary, my love! 💖</p>
+            <p>I've prepared a little adventure for you...</p>
+            <p>Complete each challenge to unlock the next one!</p>
+            <button id="start-button" onclick="startGame()">Begin Our Adventure</button>
+        </div>
+        
+        <!-- Maze Game -->
+        <div id="maze-game" class="game-section">
+            <h2>Find Your Way to My Heart, moya koxana</h2>
+            <div id="maze-container">
+                <div id="maze-player"></div>
+                <div id="maze-goal">❤️</div>
+                <!-- Walls will be added by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Quiz Game -->
+        <div id="quiz-game" class="game-section">
+            <h2>Incredible questionss</h2>
+            <p>Answer these questions to continue, moya Olechkaaaa!</p>
+            <div id="quiz-container">
+                <!-- Questions will be added by JavaScript -->
+            </div>
+            <button id="unlock-button" onclick="showVideo()">hehehehe</button>
+        </div>
+        
+        <!-- Video Screen -->
+        <div id="video-screen" class="game-section">
+            <h2>For You, My Love</h2>
+            <div id="video-container">
+                <a href="https://youtu.be/vLPny-TUHXs" target="_blank" 
+                   style="display: inline-block; padding: 20px; background-color: #ff6b81; color: white; 
+                          border-radius: 10px; text-decoration: none; font-weight: bold;">
+                   Click to Watch Our Special Video ❤️
+                </a>
+            </div>
+            <p>I love you more than words can describe. Happy Anniversary! 💖</p>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            currentSection: 'intro',
+            quizAnswers: 0
+        };
+
+        // Initialize the game
+        function startGame() {
+            showSection('maze-game');
+            setupMaze();
+        }
+
+        // Show a specific section and hide others
+        function showSection(sectionId) {
+            document.querySelectorAll('.game-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            gameState.currentSection = sectionId;
+        }
+
+        // MAZE GAME LOGIC
+        function setupMaze() {
+            const mazeContainer = document.getElementById('maze-container');
+            const mazeWidth = mazeContainer.offsetWidth;
+            const mazeHeight = mazeContainer.offsetHeight;
+            
+            // Clear existing walls
+            document.querySelectorAll('.maze-wall').forEach(wall => wall.remove());
+            
+            // Create maze walls (this is a simple maze design)
+            createWall(0, 250, 300, 20); // Horizontal wall 1
+            createWall(100, 0, 20, 200); // Vertical wall 1
+            createWall(200, 100, 20, 300); // Vertical wall 2
+            createWall(100, 300, 200, 20); // Horizontal wall 2
+            createWall(300, 200, 100, 20); // Horizontal wall 3
+            
+            // Position player at start
+            const player = document.getElementById('maze-player');
+            player.style.top = '20px';
+            player.style.left = '20px';
+            
+            // Set up keyboard controls
+            document.addEventListener('keydown', movePlayer);
+        }
+        
+        function createWall(left, top, width, height) {
+            const wall = document.createElement('div');
+            wall.className = 'maze-wall';
+            wall.style.left = left + 'px';
+            wall.style.top = top + 'px';
+            wall.style.width = width + 'px';
+            wall.style.height = height + 'px';
+            document.getElementById('maze-container').appendChild(wall);
+        }
+        
+        function movePlayer(e) {
+            if (gameState.currentSection !== 'maze-game') return;
+            
+            const player = document.getElementById('maze-player');
+            const goal = document.getElementById('maze-goal');
+            const step = 10;
+            let top = parseInt(player.style.top);
+            let left = parseInt(player.style.left);
+            
+            // Save original position
+            const originalTop = top;
+            const originalLeft = left;
+            
+            // Move based on key pressed
+            switch(e.key) {
+                case 'ArrowUp': top -= step; break;
+                case 'ArrowDown': top += step; break;
+                case 'ArrowLeft': left -= step; break;
+                case 'ArrowRight': left += step; break;
+                default: return; // Ignore other keys
+            }
+            
+            // Boundary checking
+            if (left < 0) left = 0;
+            if (top < 0) top = 0;
+            if (left > 370) left = 370;
+            if (top > 370) top = 370;
+            
+            // Collision detection with walls
+            const walls = document.querySelectorAll('.maze-wall');
+            let collision = false;
+            
+            walls.forEach(wall => {
+                const wallRect = wall.getBoundingClientRect();
+                const playerRect = {
+                    left: left + wall.parentNode.offsetLeft,
+                    top: top + wall.parentNode.offsetTop,
+                    right: left + 20 + wall.parentNode.offsetLeft,
+                    bottom: top + 20 + wall.parentNode.offsetTop
+                };
+                
+                if (!(playerRect.right < wallRect.left || 
+                      playerRect.left > wallRect.right || 
+                      playerRect.bottom < wallRect.top || 
+                      playerRect.top > wallRect.bottom)) {
+                    collision = true;
+                }
+            });
+            
+            if (!collision) {
+                player.style.top = top + 'px';
+                player.style.left = left + 'px';
+                
+                // Check if reached goal
+                const playerRect = player.getBoundingClientRect();
+                const goalRect = goal.getBoundingClientRect();
+                
+                if (!(playerRect.right < goalRect.left || 
+                      playerRect.left > goalRect.right || 
+                      playerRect.bottom < goalRect.top || 
+                      playerRect.top > goalRect.bottom)) {
+                    // Reached the goal!
+                    createConfetti();
+                    setTimeout(() => {
+                        showSection('quiz-game');
+                        setupQuiz();
+                    }, 1500);
+                }
+            }
+        }
+        
+        // QUIZ GAME LOGIC
+        function setupQuiz() {
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = '';
+            
+            const questions = [
+                {
+                    question: "First impressions when you saw me at the airport?",
+                    options: ["Why his backpack is like this?", "wow his hair is... wow", "Great Outfit", "WOW I LOVE HIM (backpack style helps)"],
+                    correct: 3 // Change this to the correct index for your story
+                },
+                {
+                    question: "What's my favorite thing about you?",
+                    options: ["Your smile", "Your kindness", "Your sense of humor", "EVERYTHING ABOUT YOU"],
+                    correct: 3 // Change this to the correct index for your story
+                },
+                {
+                    question: "What was our first cinema date?",
+                    options: ["Venom", "It ends with us", "Captain America", "Joker 2"],
+                    correct: 1 // Change this to the correct index for your story
+                },
+                {
+                    question: "How much do I love you?",
+                    options: ["so much", "incredibly so much", "infinitly so much", "So much that the timelines would end but my love for you would go beyond the timeline that we have."],
+                    correct: 3 // Change this to the correct index for your story
+                }
+            ];
+            
+            questions.forEach((q, qIndex) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'quiz-question';
+                questionDiv.textContent = q.question;
+                quizContainer.appendChild(questionDiv);
+                
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'quiz-options';
+                
+                q.options.forEach((option, oIndex) => {
+                    const optionBtn = document.createElement('div');
+                    optionBtn.className = 'quiz-option';
+                    optionBtn.textContent = option;
+                    optionBtn.dataset.questionIndex = qIndex;
+                    optionBtn.dataset.optionIndex = oIndex;
+                    optionBtn.onclick = function() {
+                        checkAnswer(this, qIndex, oIndex, q.correct);
+                    };
+                    optionsDiv.appendChild(optionBtn);
+                });
+                
+                quizContainer.appendChild(optionsDiv);
+            });
+            
+            gameState.quizAnswers = 0;
+            document.getElementById('unlock-button').style.display = 'none';
+        }
+        
+        function checkAnswer(button, qIndex, oIndex, correctIndex) {
+            const options = button.parentNode.querySelectorAll('.quiz-option');
+            
+            // Disable all options for this question
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+            
+            // Mark correct/incorrect
+            if (oIndex === correctIndex) {
+                button.classList.add('correct');
+                gameState.quizAnswers++;
+                
+                // Check if all questions answered correctly
+                if (gameState.quizAnswers === 3) {
+                    document.getElementById('unlock-button').style.display = 'block';
+                    createConfetti();
+                }
+            } else {
+                button.classList.add('incorrect');
+                // Highlight correct answer
+                options[correctIndex].classList.add('correct');
+            }
+        }
+        
+        // VIDEO SCREEN
+        function showVideo() {
+            showSection('video-screen');
+            createConfetti();
+            
+            // In a real implementation, you would have an actual video player here
+            // For example:
+            // document.getElementById('video-container').innerHTML = `
+            //     <iframe width="560" height="315" src="YOUR_VIDEO_URL" frameborder="0" allowfullscreen></iframe>
+            // `;
+        }
+        
+        // Confetti effect
+        function createConfetti() {
+            const colors = ['#ff6b81', '#ff4757', '#d23669', '#ffa502', '#eccc68'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                confetti.style.width = (Math.random() * 10 + 5) + 'px';
+                confetti.style.height = (Math.random() * 10 + 5) + 'px';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
